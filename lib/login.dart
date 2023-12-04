@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'mainAfterLogin.dart';
+import 'main_after_login.dart';
+import 'join.dart';
+import 'forgot.dart';
 
 class LoginPage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
   LoginPage({Key? key}) : super(key: key);
-
   void _signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
     try {
@@ -36,6 +36,20 @@ class LoginPage extends StatelessWidget {
         },
       );
     }
+  }
+
+  void _goToSignUp(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => JoinPage()),
+    );
+  }
+
+  void _goToForgotPassword(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
+    );
   }
 
   @override
@@ -192,7 +206,7 @@ class LoginPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           InkWell(
                             onTap: () {
-                              // 회원가입 로직
+                              _goToSignUp(context);
                             },
                             child: TextButton(
                               style: ButtonStyle(
@@ -209,7 +223,7 @@ class LoginPage extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                // 회원가입 로직
+                                _goToSignUp(context);
                               },
                               child: const Text('회원가입'),
                             ),
@@ -217,7 +231,7 @@ class LoginPage extends StatelessWidget {
                           const SizedBox(height: 10),
                           InkWell(
                             onTap: () {
-                              // Forgot password 로직
+                              _goToForgotPassword(context);
                             },
                             child: TextButton(
                               style: ButtonStyle(
@@ -234,7 +248,7 @@ class LoginPage extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                // Forgot password 로직
+                                _goToForgotPassword(context);
                               },
                               child: const Text('Forgot Password?'),
                             ),
@@ -243,28 +257,6 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // 추후에 구글 등 sns 로그인 기능 구현하기
-                  /*
-                  const SizedBox(height: 10),
-                  const Align(
-                    alignment: AlignmentDirectional(0.00, 0.00),
-                    child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 24),
-                      child: Text(
-                        'Or sign up with',
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Continue with Google logic here
-                    },
-                    child: const Text('Continue with Google'),
-                  ),
-                  */
                 ],
               ),
             ),
