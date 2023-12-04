@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 # wellbeing_life
 
-A new Flutter project.
+3-2 캡스톤 디자인 프로젝트
 
 ## Getting Started
 
