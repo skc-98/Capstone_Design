@@ -12,45 +12,46 @@ class snsAnalyze extends StatefulWidget {
 }
 
 class _snsAnalyzeState extends State<snsAnalyze> {
-  String _prediction = "";
+  late List<Map<String, dynamic>> _results;
 
-  Future<void> _countResultsFromAssets() async {
-    // test1부터 test10까지의 이미지를 순회하며 카운트합니다.
-    for (int i = 1; i <= 10; i++) {
-      String imageName = 'assets/test$i.jpg'; // 이미지 경로
-      ByteData imageData = await rootBundle.load(imageName);
-      List<int> bytes = imageData.buffer.asUint8List();
+  Future<void> _sendImageAndGetResult(String imageName) async {
+    ByteData imageData = await rootBundle.load(imageName);
+    List<int> bytes = imageData.buffer.asUint8List();
 
-      // 이미지를 서버로 전송하고 결과를 받아옵니다.
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('http://111.91.155.174:5000/predict'),
-      );
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'file',
-          bytes,
-          filename: imageName,
-        ),
-      );
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('http://111.91.155.174:5000/predict'),
+    );
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: imageName,
+      ),
+    );
 
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        response.stream.transform(utf8.decoder).listen((value) {
-          var data = jsonDecode(value);
-          String prediction = 'test$i의 예측값: ${data['prediction']}';
-          String result = '결과:\n';
-          for (var key in data['result'].keys) {
-            result += '$key: ${data['result'][key]}\n';
-          }
-          setState(() {
-            _prediction += '$prediction\n$result\n';
-          });
-        });
-      } else {
-        print('test$i에 대한 요청이 실패했습니다. 상태 코드: ${response.statusCode}');
-      }
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      var result = await response.stream.bytesToString();
+      print('Received data: $result'); // 결과 출력해보기
+      var data = jsonDecode(result);
+      Map<String, dynamic> predictionResult = {
+        'image': imageName,
+        'prediction': 'test${_results.length + 1}의 예측값: ${data['prediction']}',
+        'result': data['result']
+      };
+      setState(() {
+        _results.add(predictionResult);
+      });
+    } else {
+      print('이미지 전송 및 결과 요청 실패. 상태 코드: ${response.statusCode}');
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _results = [];
   }
 
   @override
@@ -64,21 +65,61 @@ class _snsAnalyzeState extends State<snsAnalyze> {
           children: [
             ElevatedButton(
               onPressed: () async {
-                await _countResultsFromAssets();
+                for (int i = 1; i <= 10; i++) {
+                  String imageName = 'assets/test$i.jpg';
+                  await _sendImageAndGetResult(imageName);
+                }
               },
               child: const Text('사진 전송'),
             ),
             const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                _prediction.isNotEmpty ? _prediction : '여기에 결과가 표시됩니다.',
-                style: const TextStyle(fontSize: 16),
-              ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _results.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildResultWithImage(
+                  _results[index]['image'],
+                  _results[index]['prediction'],
+                  _results[index]['result'],
+                );
+              },
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildResultWithImage(
+      String imagePath, String prediction, Map<dynamic, dynamic> result) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Image.asset(
+          // 이미지 크기 조정
+          imagePath,
+          width: 200,
+          height: 200,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(height: 10),
+        Text(
+          prediction,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: result.entries.map((entry) {
+            return Text(
+              '${entry.key}: ${entry.value}',
+              style: const TextStyle(fontSize: 14),
+            );
+          }).toList(),
+        ),
+        const Divider(), // 각 결과 사이에 구분선 추가
+      ],
     );
   }
 }

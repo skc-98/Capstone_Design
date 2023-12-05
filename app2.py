@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # 추가
 import numpy as np
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 import json
-from tensorflow.keras.preprocessing import image
+from keras.preprocessing import image
 import io
 
 app = Flask(__name__)
@@ -15,10 +15,11 @@ def predict():
     file = request.files['file']
     img = image.load_img(io.BytesIO(file.read()), target_size=(224, 224))
     img_array = image.img_to_array(img)
+    img_array=img_array/255.0
     img_array = np.expand_dims(img_array, axis=0)
     predictions = model.predict(img_array)
     max_index = np.argmax(predictions[0])
-    percentages = predictions[0] * 100
+    percentages = predictions[0] * 100 #백분율로 변환
     labels = ['음료', '조각 케이크', '탕후루', '음료 + 디저트', '빙수']
     result = {labels[i]: f'{percentages[i]:.2f}%' for i in range(len(labels))}
     return jsonify({'prediction': str(max_index), 'result': result})
