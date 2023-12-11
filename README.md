@@ -1,18 +1,9 @@
 # wellbeing_life
 
-3-2 캡스톤 디자인 프로젝트
+##3-2 캡스톤 디자인 프로젝트
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
->>>>>>> 7cfe47a7e53e366bef805b6441d17c92b319e87b
+3-2 캡스톤 디자인 팀 웰빙라이프의 프로젝트 입니다.
+### 개발기간 2023.11.03 ~ 2023.12.06
+#### 팀장: 정민석
+#### 팀원: 김대식
+#### 팀원: 송기창
